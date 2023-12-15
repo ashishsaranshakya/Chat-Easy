@@ -1,0 +1,26 @@
+{
+    "name": "chat-easy",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "client-install": "cd client && npm install",
+        "dev": "nodemon index.js",
+        "client": "cd client && npm start",
+        "build": "cd client && npm run build",
+        "prod": "nodemon index.js",
+        "populate": "node ./src/utils/populateDB.js"
+    },
+    "author": "Ashish Saran Shakya",
+    "license": "ISC",
+    "dependencies": {
+        "bcrypt": "^5.1.1",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.0.3",
+        "nodemon": "^3.0.2",
+        "socket.io": "^4.7.2"
+    }
+}
