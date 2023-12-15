@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.ashishsaranshakya.chateasy.R;
 import com.ashishsaranshakya.chateasy.Util;
 import com.ashishsaranshakya.chateasy.models.adapter.Chat;
 import com.ashishsaranshakya.chateasy.models.adapter.Message;
@@ -25,18 +26,17 @@ import io.socket.emitter.Emitter;
 
 public class SocketClientHandler {
     private static final String TAG = "SocketClientHandler";
-    private static final String SOCKET_SERVER_URL = "http://10.0.2.2:3000/";
-////////////////
 
     public static final String SOCKET_EVENT_CHATS = "chats";
     public static final String SOCKET_EVENT_MESSAGE = "message";
     public static final String SOCKET_EVENT_SINGLE_CHAT = "single chat";
     public static final String SOCKET_EVENT_JOIN_CHAT = "join chat";
     public static final String SOCKET_EVENT_LEAVE_CHAT = "leave chat";
+    public static final String SOCKET_EVENT_NEW_CHAT = "new chat";
     public static final String SOCKET_EVENT_SEARCH = "search";
     public static final String SOCKET_EVENT_SEARCH_GROUP = "search group";
+    public static final String SOCKET_EVENT_NEW_USER = "new user";
 
-////////////////
     public static final String SOCKET_OBJECT_CHAT = "chat";
     public static final String SOCKET_OBJECT_MESSAGE = "message";
     private Socket socket;
@@ -47,6 +47,7 @@ public class SocketClientHandler {
     private SocketClientHandler(Context context) {
         try {
             this.context = context;
+            String SOCKET_SERVER_URL = context.getString(R.string.api_url);
             SharedPreferences sharedPreferences = Util.getEncryptedSharedPreferences(context);
             IO.Options options = new IO.Options();
             options.auth = new HashMap<>();
@@ -147,6 +148,18 @@ public class SocketClientHandler {
             e.printStackTrace();
         }
         socket.emit(SOCKET_EVENT_LEAVE_CHAT, data);
+    }
+
+    public void addNewUserToGroup(String chatId, String userId){
+        JSONObject data = new JSONObject();
+        try{
+            data.put("chatId", chatId);
+            data.put("userId", userId);
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        socket.emit(SOCKET_EVENT_NEW_USER, data);
     }
 
     private void receiveMessage() {
@@ -257,6 +270,29 @@ public class SocketClientHandler {
                         intent.putExtra("users", (Serializable) response.getUsers());
                         SocketClientHandler.this.context.sendBroadcast(intent);
                     } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+
+        socket.on(SOCKET_EVENT_NEW_CHAT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.w(TAG, "Newly added chat received "+ args[0].toString());
+                if (args[0] instanceof JSONObject) {
+                    JSONObject data = (JSONObject) args[0];
+                    try {
+                        String _id = data.getString("chatId");
+                        String content = data.getString("lastMessage");
+                        String name = data.getString("name");
+                        boolean isGroup = data.getBoolean("isGroup");
+                        boolean isAdmin = data.getBoolean("isAdmin");
+                        Chat chat = new Chat(_id, name, content,isGroup, isAdmin);
+                        Intent intent = new Intent(SOCKET_EVENT_NEW_CHAT);
+                        intent.putExtra(SOCKET_OBJECT_CHAT, chat);
+                        SocketClientHandler.this.context.sendBroadcast(intent);
+                    } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
                 }

@@ -40,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             AuthRequest authRequest = new AuthRequest(username, password);
 
-            Call<GenericResponse> call = Util.getHttpService().register(authRequest);
+            Call<GenericResponse> call = Util.getHttpService(v.getContext()).register(authRequest);
             call.enqueue(new Callback<GenericResponse>() {
                 @Override
                 public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {

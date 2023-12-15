@@ -18,6 +18,7 @@ import com.ashishsaranshakya.chateasy.models.http.AddUserToGroupRequest;
 import com.ashishsaranshakya.chateasy.models.http.GenericResponse;
 import com.ashishsaranshakya.chateasy.models.socket.SearchUserResponse;
 import com.ashishsaranshakya.chateasy.services.HttpService;
+import com.ashishsaranshakya.chateasy.services.SocketClientHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +80,7 @@ public class AddUserGroupAdapter extends RecyclerView.Adapter {
             userHolder.image.setImageBitmap(iconBitmap);
         }
         userHolder.parent.setOnClickListener(v -> {
-            HttpService httpService = Util.getHttpService();
+            HttpService httpService = Util.getHttpService(v.getContext());
             String token = Util.getEncryptedSharedPreferences(v.getContext()).getString("session", "");
             AddUserToGroupRequest addUserToGroupRequest = new AddUserToGroupRequest(user.get_id());
             httpService.addUserToGroup(token, chatId, addUserToGroupRequest)
@@ -89,7 +90,8 @@ public class AddUserGroupAdapter extends RecyclerView.Adapter {
                         if (response.isSuccessful()) {
                             GenericResponse genericResponse = response.body();
                             if (genericResponse != null && genericResponse.getSuccess()) {
-                                userAdded(holder.getAdapterPosition());
+                                userAddedToGroup(holder.getAdapterPosition());
+                                SocketClientHandler.getInstance(v.getContext()).addNewUserToGroup(chatId, user.get_id());
                                 Toast.makeText(v.getContext(), "User added successfully", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(v.getContext(), "Error occurred", Toast.LENGTH_SHORT).show();
@@ -127,7 +129,7 @@ public class AddUserGroupAdapter extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-    public void userAdded(int position){
+    public void userAddedToGroup(int position){
         this.users.remove(position);
         notifyItemRemoved(position);
     }

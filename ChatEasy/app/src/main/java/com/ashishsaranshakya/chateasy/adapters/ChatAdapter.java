@@ -96,7 +96,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
         notifyItemInserted(chats.size() - 1);
     }
 
-    public void newChat(Chat chat) {
+    public void addChat(Chat chat) {
         chats.add(0, chat);
         notifyItemInserted(0);
     }

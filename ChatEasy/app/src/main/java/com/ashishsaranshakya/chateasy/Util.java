@@ -35,9 +35,9 @@ public class Util {
         }
     }
 
-    public static HttpService getHttpService() {
+    public static HttpService getHttpService(Context context) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:3000/")
+                .baseUrl(context.getString(R.string.api_url))
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

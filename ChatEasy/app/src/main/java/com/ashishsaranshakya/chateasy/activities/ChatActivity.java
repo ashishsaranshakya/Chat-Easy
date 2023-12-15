@@ -137,7 +137,7 @@ public class ChatActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = Util.getEncryptedSharedPreferences(this);
         assert sharedPreferences != null;
         String token = sharedPreferences.getString("session", "");
-        Util.getHttpService().deleteChat(token, chatId).enqueue(new Callback<DeleteChatResponse>() {
+        Util.getHttpService(this).deleteChat(token, chatId).enqueue(new Callback<DeleteChatResponse>() {
             @Override
             public void onResponse(@NonNull Call<DeleteChatResponse> call, @NonNull Response<DeleteChatResponse> response) {
                 Log.w("ChatActivity", "onResponse: " + response);
@@ -169,7 +169,7 @@ public class ChatActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = Util.getEncryptedSharedPreferences(this);
         assert sharedPreferences != null;
         String token = sharedPreferences.getString("session", "");
-        Util.getHttpService().deleteGroup(token, chatId).enqueue(new Callback<DeleteChatResponse>() {
+        Util.getHttpService(this).deleteGroup(token, chatId).enqueue(new Callback<DeleteChatResponse>() {
             @Override
             public void onResponse(@NonNull Call<DeleteChatResponse> call, @NonNull Response<DeleteChatResponse> response) {
                 Log.w("ChatActivity", "onResponse: " + response);

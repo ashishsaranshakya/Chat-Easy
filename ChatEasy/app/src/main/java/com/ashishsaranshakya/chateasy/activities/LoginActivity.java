@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 
             AuthRequest authRequest = new AuthRequest(username, password); // Replace with your login credentials
 
-            Call<LoginResponse> call = Util.getHttpService().login(authRequest);
+            Call<LoginResponse> call = Util.getHttpService(v.getContext()).login(authRequest);
             call.enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {

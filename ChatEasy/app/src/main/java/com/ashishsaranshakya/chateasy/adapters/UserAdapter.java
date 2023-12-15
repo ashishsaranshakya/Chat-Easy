@@ -81,7 +81,7 @@ public class UserAdapter extends RecyclerView.Adapter {
         }
         userHolder.parent.setOnClickListener(v -> {
             Log.w("UserAdapter", "onBindViewHolder: " + user.get_id());
-            HttpService httpService = Util.getHttpService();
+            HttpService httpService = Util.getHttpService(v.getContext());
             String token = Util.getEncryptedSharedPreferences(v.getContext()).getString("session", "");
             httpService.createChat(token, user.get_id())
                     .enqueue(new Callback<CreateChatResponse>() {

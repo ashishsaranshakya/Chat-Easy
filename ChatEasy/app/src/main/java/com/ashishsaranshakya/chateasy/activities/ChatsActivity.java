@@ -63,6 +63,14 @@ public class ChatsActivity extends AppCompatActivity {
         }
     };
 
+    BroadcastReceiver newChatReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Chat chat = (Chat) intent.getSerializableExtra(SocketClientHandler.SOCKET_OBJECT_CHAT);
+            chatAdapter.addChat(chat);
+        }
+    };
+
     BroadcastReceiver newMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -88,7 +96,7 @@ public class ChatsActivity extends AppCompatActivity {
         chats.setLayoutManager(new LinearLayoutManager(this));
 
         registerReceiver(allChatsReceiver, new IntentFilter(SocketClientHandler.SOCKET_EVENT_CHATS), Context.RECEIVER_NOT_EXPORTED);
-        registerReceiver(newMessageReceiver, new IntentFilter(SocketClientHandler.SOCKET_EVENT_MESSAGE), Context.RECEIVER_NOT_EXPORTED);
+        registerReceiver(newChatReceiver, new IntentFilter(SocketClientHandler.SOCKET_EVENT_NEW_CHAT), Context.RECEIVER_NOT_EXPORTED);
 
         SocketClientHandler.getInstance(this).getChats();
 
@@ -120,6 +128,18 @@ public class ChatsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        registerReceiver(newMessageReceiver, new IntentFilter(SocketClientHandler.SOCKET_EVENT_MESSAGE), Context.RECEIVER_NOT_EXPORTED);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(newMessageReceiver);
+        super.onPause();
+    }
+
     private void setContracts(){
         searchResultLauncher = registerForActivityResult(
                 new ActivityResultContract<String, CreateChatResponse>() {
@@ -143,7 +163,7 @@ public class ChatsActivity extends AppCompatActivity {
                             false,
                             false
                     );
-                    chatAdapter.newChat(chat);
+                    chatAdapter.addChat(chat);
                     SocketClientHandler.getInstance(ChatsActivity.this).joinChat(chat.getChatId());
                     chatDeletionLauncher.launch(new String[]{chat.getChatId(), chat.getChatName(), "false", "false"});
                 });
@@ -216,7 +236,7 @@ public class ChatsActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String enteredText = input.getText().toString();
                 if(enteredText.isEmpty()) return;
-                HttpService httpService = Util.getHttpService();
+                HttpService httpService = Util.getHttpService(ChatsActivity.this);
                 String token = Util.getEncryptedSharedPreferences(ChatsActivity.this).getString("session", "");
                 httpService.createGroup(token, new CreateGroupRequest(enteredText))
                     .enqueue(new Callback<CreateChatResponse>() {
@@ -232,7 +252,7 @@ public class ChatsActivity extends AppCompatActivity {
                                         true,
                                         true
                                 );
-                                chatAdapter.newChat(chat);
+                                chatAdapter.addChat(chat);
                                 SocketClientHandler.getInstance(ChatsActivity.this).joinChat(chat.getChatId());
                                 chatDeletionLauncher.launch(new String[]{chat.getChatId(), chat.getChatName(), "true", "true"});
                             }
