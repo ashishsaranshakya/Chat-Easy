@@ -9,8 +9,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ChatEasy"
-        android:usesCleartextTraffic="true">
+        android:theme="@style/Theme.ChatEasy">
         <activity
             android:name=".activities.GroupMembersActivity"
             android:exported="false" />

@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Chat Easy</string>
-    <string name="api_url">http://10.0.2.2:3000/</string>
+    <string name="api_url">https://chat-easy.onrender.com/</string>
 </resources>
