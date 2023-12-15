@@ -9,8 +9,10 @@ const CHATS = "chats";
 const MESSAGE = "message";
 const JOIN_CHAT = "join chat";
 const LEAVE_CHAT = "leave chat";
+const NEW_CHAT = "new chat";
 const SINGLE_CHAT = "single chat";
 const SEARCH = "search";
+const NEW_USER = "new user";
 const SEARCH_GROUP = "search group";
 
 export default (server) => {
@@ -151,12 +153,51 @@ export default (server) => {
 			});
 		})
 		
-		socket.on(JOIN_CHAT, (data) => {
+		socket.on(JOIN_CHAT, async (data) => {
+			const chat = await Chat.findById(data.chatId);
 			socket.join(data.chatId);
+			const connectedSockets = io.sockets.sockets;
+			const id = socket.user.userId;
+			for(const [key, socket] of connectedSockets.entries()) {
+				if (socket.user.userId!==id && chat.members.includes(socket.user.userId)) {
+					if (!chat.isGroup) {
+						chat.name = (await User.findById(chat.members.find(member => member.toString() !== socket.user.userId.toString()))).username;
+					}
+					const lastMessage = await Message.findById(chat.lastMessage);
+					socket.emit(NEW_CHAT, {
+						chatId: chat.id,
+						name: chat.name,
+						lastMessage: lastMessage ? lastMessage.content : "",
+						isGroup: chat.isGroup,
+						isAdmin: chat.admin ? chat.admin.toString() === socket.user.userId.toString() : false,
+						updatedAt: Number(chat.updatedAt)
+					});
+				}
+			};
 		});
 
 		socket.on(LEAVE_CHAT, (data) => {
 			socket.leave(data.chatId);
+		});
+
+		socket.on(NEW_USER, async (data) => {
+			const { chatId, userId } = data;
+			const connectedSockets = io.sockets.sockets;
+			const chat = await Chat.findById(chatId);
+			for(const [key, socket] of connectedSockets.entries()) {
+				if (socket.user.userId === userId) {
+					const lastMessage = await Message.findById(chat.lastMessage);
+					socket.join(chatId);
+					socket.emit(NEW_CHAT, {
+						chatId: chat.id,
+						name: chat.name,
+						lastMessage: lastMessage ? lastMessage.content : "",
+						isGroup: chat.isGroup,
+						isAdmin: chat.admin ? chat.admin.toString() === socket.user.userId.toString() : false,
+						updatedAt: Number(chat.updatedAt)
+					});
+				}
+			};
 		});
 	});
 }

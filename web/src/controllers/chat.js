@@ -151,3 +151,53 @@ export const deleteGroup = async (req, res, next) => {
 		next(err);
 	}
 }
+
+export const getGroupMembers = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const chat = await Chat.findById(id);
+		if (!chat) return next(createAPIError(400, false, 'Chat not found'));
+		if (chat.members.indexOf(req.user.userId) === -1)
+			return next(createAPIError(403, false, 'You are not allowed to view this chat'));
+
+		const members = await User.find({ _id: { $in: chat.members } }).select('username');
+		res.status(200).json({
+			success: true,
+			users: members
+		});
+	}
+	catch (err) {
+		console.log(err);
+		next(err);
+	}
+}
+
+export const removeFromGroup = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { userId } = req.body;
+		if (!userId) return next(createAPIError(400, false, 'User ID is required'));
+
+		const chat = await Chat.findById(id);
+		if (!chat) return next(createAPIError(400, false, 'Chat not found'));
+
+		if (chat.admin.toString() !== req.user.userId.toString()) {
+			return next(createAPIError(403, false, 'You are not allowed to remove members'));
+		}
+		if (!chat.members.includes(userId)) {
+			return next(createAPIError(400, false, 'User not in the group'));
+		}
+
+		chat.members = chat.members.filter(member => member.toString() !== userId.toString());
+		await chat.save();
+
+		res.status(200).json({
+			success: true,
+			message: 'User removed from group successfully'
+		});
+	}
+	catch (err) {
+		console.log(err);
+		next(err);
+	}
+}
