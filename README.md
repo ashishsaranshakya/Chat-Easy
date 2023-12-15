@@ -10,6 +10,12 @@ ChatEasy is a real-time messaging Android application that utilizes a Node.js ba
 - **Express Server:** Handles HTTP requests and API endpoints for user authentication and messaging functionalities.
 - **Socket.IO Server:** Facilitates real-time bidirectional communication for instant messaging updates.
 
+<details>
+  <summary><h2>Preview Video</h2></summary>
+  <video src="https://github.com/ashishsaranshakya/Chat-Easy/assets/74979286/94cbe006-942c-4f97-badf-f07dca0d464f"></video>
+</details>
+
+
 ## Backend Setup
 
 The backend is built using Node.js and utilizes Express for RESTful APIs and Socket.IO for real-time communication. To set up the backend:
@@ -41,3 +47,4 @@ To run the ChatEasy Android application:
 - **Socket.IO:** Real-time bidirectional event-based communication.
 
 Feel free to contribute, report issues, or suggest new features to enhance ChatEasy!
+
