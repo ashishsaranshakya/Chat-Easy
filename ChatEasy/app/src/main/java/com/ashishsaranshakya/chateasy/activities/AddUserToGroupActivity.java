@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.widget.EditText;
 
 import androidx.annotation.RequiresApi;
@@ -35,7 +34,6 @@ public class AddUserToGroupActivity extends AppCompatActivity implements TextWat
             Object object = intent.getSerializableExtra("users");
             assert object instanceof List;
             List<SearchUserResponse.User> response = (List<SearchUserResponse.User>) object;
-            Log.w("SearchUserActivity", "onReceive: "+response);
             userAdapter.setUsers(response);
         }
     };

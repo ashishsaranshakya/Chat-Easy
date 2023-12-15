@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ashishsaranshakya.chateasy.MainActivity;
+import com.ashishsaranshakya.chateasy.LauncherActivity;
 import com.ashishsaranshakya.chateasy.R;
 import com.ashishsaranshakya.chateasy.Util;
 import com.ashishsaranshakya.chateasy.adapters.ChatAdapter;
@@ -174,7 +173,6 @@ public class ChatsActivity extends AppCompatActivity {
                     public DeleteChatResponse parseResult(int i, @Nullable Intent intent) {
                         if(intent == null) return null;
                         if(i!=RESULT_OK) return null;
-                        Log.w("ChatDeletionLauncher", "parseResult: " + intent.getSerializableExtra(CONTRACT_OBJECT_DELETION));
                         return (DeleteChatResponse) intent.getSerializableExtra(CONTRACT_OBJECT_DELETION);
                     }
 
@@ -217,7 +215,7 @@ public class ChatsActivity extends AppCompatActivity {
             editor.remove("session");
             editor.apply();
             SocketClientHandler.deleteConnection();
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, LauncherActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

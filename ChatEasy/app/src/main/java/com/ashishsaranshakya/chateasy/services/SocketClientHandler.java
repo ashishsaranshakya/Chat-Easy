@@ -190,7 +190,6 @@ public class SocketClientHandler {
         socket.on(SOCKET_EVENT_CHATS, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                Log.w(TAG, "Chats received "+ args[0].toString());
                 if (args[0] instanceof JSONObject) {
                     JSONObject data = (JSONObject) args[0];
                     try {
@@ -279,7 +278,6 @@ public class SocketClientHandler {
         socket.on(SOCKET_EVENT_NEW_CHAT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                Log.w(TAG, "Newly added chat received "+ args[0].toString());
                 if (args[0] instanceof JSONObject) {
                     JSONObject data = (JSONObject) args[0];
                     try {

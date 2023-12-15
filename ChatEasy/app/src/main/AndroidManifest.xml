@@ -12,6 +12,9 @@
         android:theme="@style/Theme.ChatEasy"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activities.GroupMembersActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.AddUserToGroupActivity"
             android:exported="false" />
         <activity
@@ -30,7 +33,7 @@
             android:name=".activities.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".LauncherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

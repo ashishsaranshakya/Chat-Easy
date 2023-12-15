@@ -11,7 +11,7 @@ import com.ashishsaranshakya.chateasy.activities.ChatsActivity;
 import com.ashishsaranshakya.chateasy.activities.LoginActivity;
 import com.ashishsaranshakya.chateasy.activities.RegisterActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class LauncherActivity extends AppCompatActivity {
     Button register;
     Button login;
     @Override
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = Util.getEncryptedSharedPreferences(this);
         String token = sharedPreferences.getString("session", "");
         if (!token.equals("")) {
-            Intent intent = new Intent(MainActivity.this, ChatsActivity.class);
+            Intent intent = new Intent(LauncherActivity.this, ChatsActivity.class);
             startActivity(intent);
             finish();
         }
@@ -31,12 +31,12 @@ public class MainActivity extends AppCompatActivity {
         login = findViewById(R.id.btnLogin);
 
         login.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            Intent intent = new Intent(LauncherActivity.this, LoginActivity.class);
             startActivity(intent);
         });
 
         register.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            Intent intent = new Intent(LauncherActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
 

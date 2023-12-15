@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.widget.EditText;
 
 import androidx.annotation.RequiresApi;
@@ -35,11 +34,8 @@ public class SearchUserActivity extends AppCompatActivity implements TextWatcher
         @Override
         public void onReceive(Context context, Intent intent) {
             Object object = intent.getSerializableExtra("users");
-            // assert class List<SearchUserResponse.User>
             assert object instanceof List;
             List<SearchUserResponse.User> response = (List<SearchUserResponse.User>) object;
-            //List<SearchUserResponse.User> response = (List<SearchUserResponse.User>) intent.getSerializableExtra("users");
-            Log.w("SearchUserActivity", "onReceive: "+response);
             userAdapter.setUsers(response);
         }
     };
@@ -64,7 +60,6 @@ public class SearchUserActivity extends AppCompatActivity implements TextWatcher
 
     public void searchFinished(CreateChatResponse response){
         unregisterReceiver(searchReceiver);
-        Log.w("SearchUserActivity", "searchFinished: "+response);
         Intent intent = new Intent();
         intent.putExtra(CONTRACT_OBJECT_CHAT, response);
         setResult(RESULT_OK, intent);

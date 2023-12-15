@@ -37,6 +37,7 @@ public class ChatActivity extends AppCompatActivity {
     private static final int MENU_ADD = 1;
     private static final int MENU_LEAVE = 2;
     private static final int MENU_DELETE = 3;
+    private static final int MENU_DETAILS = 4;
     RecyclerView messageRecyclerView;
     MessageAdapter messageAdapter;
     EditText messageTxt;
@@ -109,6 +110,8 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
+        if(isGroup)
+            menu.add(0, MENU_DETAILS, Menu.NONE, "Group details").setIcon(null);
         menu.add(0, MENU_LEAVE, Menu.NONE, "Leave Chat").setIcon(R.drawable.ic_leave);
         if(isAdmin) {
             menu.add(0, MENU_DELETE, Menu.NONE, "Delete group").setIcon(R.drawable.ic_delete);
@@ -128,6 +131,13 @@ public class ChatActivity extends AppCompatActivity {
         else if (item.getItemId() == MENU_ADD) {
             Intent intent = new Intent(this, AddUserToGroupActivity.class);
             intent.putExtra("chatId", chatId);
+            startActivity(intent);
+        }
+        else if (item.getItemId() == MENU_DETAILS) {
+            Intent intent = new Intent(this, GroupMembersActivity.class);
+            intent.putExtra("chatId", chatId);
+            intent.putExtra("chatName", getTitle());
+            intent.putExtra("isAdmin", isAdmin);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
@@ -172,7 +182,6 @@ public class ChatActivity extends AppCompatActivity {
         Util.getHttpService(this).deleteGroup(token, chatId).enqueue(new Callback<DeleteChatResponse>() {
             @Override
             public void onResponse(@NonNull Call<DeleteChatResponse> call, @NonNull Response<DeleteChatResponse> response) {
-                Log.w("ChatActivity", "onResponse: " + response);
                 if (response.isSuccessful()) {
                     DeleteChatResponse res = response.body();
                     if (res != null && res.getSuccess()) {

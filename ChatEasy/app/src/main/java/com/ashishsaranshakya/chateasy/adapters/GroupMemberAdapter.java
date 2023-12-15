@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ashishsaranshakya.chateasy.R;
 import com.ashishsaranshakya.chateasy.Util;
-import com.ashishsaranshakya.chateasy.activities.SearchUserActivity;
-import com.ashishsaranshakya.chateasy.models.http.CreateChatResponse;
+import com.ashishsaranshakya.chateasy.models.http.AddUserToGroupRequest;
+import com.ashishsaranshakya.chateasy.models.http.GenericResponse;
 import com.ashishsaranshakya.chateasy.models.socket.SearchUserResponse;
 import com.ashishsaranshakya.chateasy.services.HttpService;
 
@@ -26,29 +25,27 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class UserAdapter extends RecyclerView.Adapter {
-
+public class GroupMemberAdapter extends RecyclerView.Adapter {
     private final LayoutInflater inflater;
     private List<SearchUserResponse.User> users = new ArrayList<>();
-    private final SearchUserActivity activity;
-
-    public UserAdapter(LayoutInflater inflater, SearchUserActivity activity) {
+    private String chatId;
+    private boolean isAdmin;
+    public GroupMemberAdapter(LayoutInflater inflater, String chatId, boolean isAdmin) {
         this.inflater = inflater;
-        this.activity = activity;
+        this.chatId = chatId;
+        this.isAdmin = isAdmin;
     }
 
     private class UserHolder extends RecyclerView.ViewHolder {
-
         TextView nameTxt;
-        ImageView image;
-        RelativeLayout parent;
+        ImageView image, removeBtn;
 
         public UserHolder(@NonNull View itemView) {
             super(itemView);
 
             nameTxt = itemView.findViewById(R.id.nameTxt);
             image = itemView.findViewById(R.id.image);
-            parent = itemView.findViewById(R.id.chat_container);
+            removeBtn = itemView.findViewById(R.id.removeUser);
         }
     }
 
@@ -60,7 +57,7 @@ public class UserAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.item_user, parent, false);
+        View view = inflater.inflate(R.layout.item_group_member, parent, false);
         return new UserHolder(view);
     }
 
@@ -78,41 +75,42 @@ public class UserAdapter extends RecyclerView.Adapter {
             Bitmap iconBitmap = Util.generateIconForLetter(firstLetter, holder.itemView.getContext());
             userHolder.image.setImageBitmap(iconBitmap);
         }
-        userHolder.parent.setOnClickListener(v -> {
+
+        userHolder.removeBtn.setOnClickListener(v -> {
             HttpService httpService = Util.getHttpService(v.getContext());
             String token = Util.getEncryptedSharedPreferences(v.getContext()).getString("session", "");
-            httpService.createChat(token, user.get_id())
-                    .enqueue(new Callback<CreateChatResponse>() {
+            httpService.removeUserFromGroup(token, chatId, new AddUserToGroupRequest(user.get_id()))
+                    .enqueue(new Callback<GenericResponse>() {
                         @Override
-                        public void onResponse(@NonNull Call<CreateChatResponse> call, @NonNull Response<CreateChatResponse> response) {
-                            if (response.isSuccessful()) {
-                                CreateChatResponse chatResponse = response.body();
-                                assert chatResponse != null;
-                                activity.searchFinished(chatResponse);
+                        public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+                            if(response.body().getSuccess()){
+                                Toast.makeText(v.getContext(), "User removed successfully", Toast.LENGTH_SHORT).show();
+                                users.remove(holder.getAdapterPosition());
+                                notifyItemRemoved(holder.getAdapterPosition());
+                            }
+                            else{
+                                Toast.makeText(v.getContext(), "Error occurred", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
-                        public void onFailure(@NonNull Call<CreateChatResponse> call, @NonNull Throwable t) {
+                        public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
                             Toast.makeText(v.getContext(), "Error occurred", Toast.LENGTH_SHORT).show();
                         }
                     });
         });
+
+        if(!isAdmin){
+            userHolder.removeBtn.setVisibility(View.GONE);
+        }
+        else if(user.get_id().equals(Util.getEncryptedSharedPreferences(holder.itemView.getContext()).getString("userId", ""))){
+            userHolder.removeBtn.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public int getItemCount() {
         return users.size();
-    }
-
-    public void addItem (SearchUserResponse.User user) {
-        users.add(user);
-        notifyItemInserted(users.size() - 1);
-    }
-
-    public void clear() {
-        users.clear();
-        notifyItemRangeRemoved(0, users.size()-1);
     }
 
     public void setUsers(List<SearchUserResponse.User> users) {

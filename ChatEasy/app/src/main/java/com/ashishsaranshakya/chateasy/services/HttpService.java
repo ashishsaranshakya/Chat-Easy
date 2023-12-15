@@ -7,13 +7,16 @@ import com.ashishsaranshakya.chateasy.models.http.CreateGroupRequest;
 import com.ashishsaranshakya.chateasy.models.http.DeleteChatResponse;
 import com.ashishsaranshakya.chateasy.models.http.GenericResponse;
 import com.ashishsaranshakya.chateasy.models.http.LoginResponse;
+import com.ashishsaranshakya.chateasy.models.socket.SearchUserResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface HttpService {
@@ -32,9 +35,15 @@ public interface HttpService {
     @DELETE("api/v1/chat/group/{id}")
     Call<DeleteChatResponse> deleteGroup(@Header("Authorization") String authorization, @Path("id") String chatId);
 
-    @PATCH("api/v1/chat/group/{id}")
+    @PUT("api/v1/chat/group/{id}")
     Call<GenericResponse> addUserToGroup(@Header("Authorization") String authorization, @Path("id") String chatId, @Body AddUserToGroupRequest addUserToGroupRequest);
 
     @POST("api/v1/chat/group")
     Call<CreateChatResponse> createGroup(@Header("Authorization") String authorization, @Body CreateGroupRequest createGroupRequest);
+
+    @GET("api/v1/chat/group/{id}")
+    Call<SearchUserResponse> getGroupMembers(@Header("Authorization") String authorization, @Path("id") String chatId);
+
+    @PATCH("api/v1/chat/group/{id}")
+    Call<GenericResponse> removeUserFromGroup(@Header("Authorization") String authorization, @Path("id") String chatId, @Body AddUserToGroupRequest addUserToGroupRequest);
 }
