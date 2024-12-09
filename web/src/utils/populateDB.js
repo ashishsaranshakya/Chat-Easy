@@ -51,9 +51,9 @@ const populateDB = async () => {
 
     // Create group chats with different members
     const groupChats = [
-      { name: 'Group 1', admin: users[0]._id, members: [users[0]._id, users[1]._id, users[2]._id] },
-      { name: 'Group 2', admin: users[3]._id, members: [users[3]._id, users[4]._id, users[5]._id] },
-      { name: 'Group 3', admin: users[1]._id, members: [users[1]._id, users[2]._id, users[3]._id, users[4]._id] },
+      { name: 'Family', admin: users[0]._id, members: [users[0]._id, users[1]._id, users[5]._id] },
+      { name: 'Friends', admin: users[3]._id, members: [users[3]._id, users[4]._id, users[5]._id] },
+      { name: 'Work- Devs', admin: users[1]._id, members: [users[1]._id, users[2]._id, users[3]._id, users[4]._id] },
     ];
 
     const createdGroupChats = await Chat.insertMany(groupChats.map(chat => ({
@@ -66,16 +66,88 @@ const populateDB = async () => {
 
     const messages = [];
 
-    allChats.forEach(chat => {
-      for (let i = 0; i < 10; i++) {
-        const randomUser = chat.members[Math.floor(Math.random() * chat.members.length)];
-        messages.push({
-          sender: randomUser._id,
-          content: `Message ${i + 1} in ${chat.isGroup ? 'group' : 'chat'} ${chat._id}`,
-          chat: chat._id,
-        });
-      }
+    let temp = ["Hi, Bob!", "Hey there, Alice! How's your day going?",
+      "Not bad. What about you?",
+      "Pretty good, thanks! Have you seen the latest movie?",
+      "Yes, watched it last weekend. It was fantastic! Have you seen it yet?",
+      "Not yet, planning to watch it this Friday. What did you like the most about it?",
+      "The storyline was captivating, and the special effects were impressive!",
+      "Sounds exciting! I can't wait to see it. What other movies have you watched recently?",
+      'Saw a comedy and a thriller. Both were pretty good.',
+      'Nice choices! Anything else new with you?',]
+    
+    for (let i = 0; i < 10; i++) {
+      messages.push({
+        sender: users[i%2]._id,
+        content: temp[i],
+        chat: allChats[0]._id,
+      });
+    }
+
+    messages.push({
+      sender: users[1]._id,
+      content: "Hi, David!",
+      chat: allChats[2]._id,
     });
+    messages.push({
+      sender: users[3]._id,
+      content: "How's your day going?",
+      chat: allChats[2]._id,
+    });
+
+    const groupConversation = [
+      "Hey, everyone! How's your day going?",
+      "Hey Alice! Pretty good, just busy with work. How about you?",
+      "Hey guys! I'm doing alright. Just chilling at home.",
+      "That's nice! We should plan something fun for the weekend.",
+      "Absolutely! Maybe we could plan a movie night or a small get-together.",
+      "That sounds like a great idea! What do you think, Alice?",
+      "Count me in! A movie night would be perfect for a relaxing weekend.",
+      "Awesome! We can decide on the movie and snacks later this week.",
+      "Definitely. By the way, did anyone watch that new series on Netflix?",
+      "Not yet! I've heard good things about it though. Is it worth watching?",
+      "I've seen a few episodes. It's pretty intriguing, might be worth a shot.",
+      "Alright, I'll check it out. Thanks, guys!",
+      "No problem! Let us know your thoughts once you start watching it.",
+      "Absolutely. Always up for some show recommendations."
+    ];
+
+    let grp = [users[0], users[1], users[5]];
+
+    for (let i = 0; i < groupConversation.length; i++) {
+      messages.push({
+        sender: grp[i%3]._id,
+        content: groupConversation[i],
+        chat: createdGroupChats[0]._id,
+      });
+    }
+
+    const workDevGroupConversation = [
+      "Good morning, team! How's everyone doing today?",
+      "Morning, Bob! Doing well, just reviewing the new code changes.",
+      "Hey, everyone! I'm debugging some issues from yesterday's merge.",
+      "Hi, folks! I'm working on the UI updates for the upcoming release.",
+      "Great to hear! Charlie, any blockers with the code review?",
+      "Not really, just a few minor suggestions. Should be done soon.",
+      "I think I've found the root cause. It was an oversight in the logic.",
+      "Awesome, David! Let me know if you need any help with the UI.",
+      "Thanks for the updates, team. We're making good progress.",
+      "Absolutely! It's all coming together nicely.",
+      "Agreed. Once these fixes are in, we'll be ready for testing.",
+      "Looking forward to it! The UI changes are looking sleek, by the way.",
+      "Appreciate the effort, Emma! We're almost there, team.",
+      "Definitely. Let's keep up the momentum!"
+    ];
+
+    grp = [users[1]._id, users[2]._id, users[3]._id, users[4]._id];
+
+    for (let i = 0; i < workDevGroupConversation.length; i++) {
+      messages.push({
+        sender: grp[i%4],
+        content: workDevGroupConversation[i],
+        chat: createdGroupChats[2]._id,
+      });
+    }
 
     const insertedMessages = await Message.insertMany(messages);
 
