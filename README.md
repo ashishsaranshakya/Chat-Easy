@@ -12,7 +12,7 @@ ChatEasy is a real-time messaging Android application that utilizes a Node.js ba
 
 <details>
   <summary><h2>Preview Video</h2></summary>
-  <video src="Preview.mp4"></video>
+  <video src="https://github.com/ashishsaranshakya/Chat-Easy/assets/74979286/94cbe006-942c-4f97-badf-f07dca0d464f"></video>
 </details>
 
 
